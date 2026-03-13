@@ -33,19 +33,23 @@ export default function DiabetesPrediction() {
     setError(null);
 
     try {
-      const payload = {
-        Pregnancies: parseInt(formData.Pregnancies, 10),
-        Glucose: parseFloat(formData.Glucose),
-        BloodPressure: parseFloat(formData.BloodPressure),
-        SkinThickness: parseFloat(formData.SkinThickness),
-        Insulin: parseFloat(formData.Insulin),
-        BMI: parseFloat(formData.BMI),
-        DiabetesPedigreeFunction: parseFloat(formData.DiabetesPedigreeFunction),
-        Age: parseInt(formData.Age, 10)
-      };
+      const dataList = [
+        parseInt(formData.Pregnancies, 10),
+        parseFloat(formData.Glucose),
+        parseFloat(formData.BloodPressure),
+        parseFloat(formData.SkinThickness),
+        parseFloat(formData.Insulin),
+        parseFloat(formData.BMI),
+        parseFloat(formData.DiabetesPedigreeFunction),
+        parseInt(formData.Age, 10)
+      ];
+
+      const payload = { data: dataList };
 
       try {
-        const response = await axios.post("http://localhost:8000/predict/diabetes", payload);
+        const userId = localStorage.getItem("user_id");
+        const url = userId ? `http://localhost:8000/predict/diabetes?user_id=${userId}` : "http://localhost:8000/predict/diabetes";
+        const response = await axios.post(url, payload);
         processResult(response.data.risk_percentage);
       } catch (err) {
         console.warn("Backend unavailable, using simulated prediction logic.");

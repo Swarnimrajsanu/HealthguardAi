@@ -14,7 +14,14 @@ export default function HeartPrediction() {
         ChestPainType: "0",
         RestingBP: "",
         Cholesterol: "",
+        FastingBS: "0",
+        RestingECG: "0",
         MaxHeartRate: "",
+        ExerciseAngina: "0",
+        Oldpeak: "0",
+        ST_Slope: "1",
+        Ca: "0",
+        Thal: "1",
     });
 
     const [loading, setLoading] = useState(false);
@@ -28,22 +35,34 @@ export default function HeartPrediction() {
         e.preventDefault();
         setLoading(true);
 
-        const payload = {
-            Age: parseInt(formData.Age, 10),
-            Sex: parseInt(formData.Sex, 10),
-            ChestPainType: parseInt(formData.ChestPainType, 10),
-            RestingBP: parseFloat(formData.RestingBP),
-            Cholesterol: parseFloat(formData.Cholesterol),
-            MaxHeartRate: parseFloat(formData.MaxHeartRate),
-        };
+        const dataList = [
+            parseInt(formData.Age, 10) || 0,
+            parseInt(formData.Sex, 10),
+            parseInt(formData.ChestPainType, 10),
+            parseFloat(formData.RestingBP) || 0,
+            parseFloat(formData.Cholesterol) || 0,
+            parseInt(formData.FastingBS, 10),
+            parseInt(formData.RestingECG, 10),
+            parseFloat(formData.MaxHeartRate) || 0,
+            parseInt(formData.ExerciseAngina, 10),
+            parseFloat(formData.Oldpeak) || 0,
+            parseInt(formData.ST_Slope, 10),
+            parseInt(formData.Ca, 10),
+            parseInt(formData.Thal, 10),
+        ];
+
+        const payload = { data: dataList };
 
         try {
-            const response = await axios.post("http://localhost:8000/predict/heart", payload);
+            const userId = localStorage.getItem("user_id");
+            const url = userId ? `http://localhost:8000/predict/heart?user_id=${userId}` : "http://localhost:8000/predict/heart";
+            const response = await axios.post(url, payload);
             processResult(response.data.risk_percentage);
         } catch (err) {
-            console.warn("Backend unavailable, using simulated prediction logic.");
+            console.error("Prediction Error:", err);
+            console.warn("Backend unavailable or error occurred, using simulated prediction logic.");
             setTimeout(() => {
-                const values = Object.values(payload);
+                const values = dataList;
                 const sum = values.reduce((a, b) => a + (isNaN(b) ? 0 : b), 0);
                 const simulatedRisk = (sum % 90) + 5;
                 processResult(simulatedRisk);
@@ -134,7 +153,112 @@ export default function HeartPrediction() {
 
                             <FloatingInput label="Resting BP (mm Hg)" name="RestingBP" value={formData.RestingBP} onChange={handleChange} />
                             <FloatingInput label="Cholesterol (mg/dl)" name="Cholesterol" value={formData.Cholesterol} onChange={handleChange} />
+                            
+                            <div className="relative z-0 w-full mb-6 group">
+                                <select
+                                    name="FastingBS"
+                                    id="FastingBS"
+                                    value={formData.FastingBS}
+                                    onChange={handleChange}
+                                    className="block p-4 w-full text-base text-slate-900 bg-slate-50 border border-slate-200 rounded-2xl appearance-none focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all peer"
+                                >
+                                    <option value="0">False</option>
+                                    <option value="1">True</option>
+                                </select>
+                                <label className="absolute text-sm text-slate-500 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] left-4 bg-slate-50 px-1 rounded peer-focus:text-blue-600">
+                                    Fasting Blood Sugar ({">"}120 mg/dl)
+                                </label>
+                            </div>
+
+                            <div className="relative z-0 w-full mb-6 group">
+                                <select
+                                    name="RestingECG"
+                                    id="RestingECG"
+                                    value={formData.RestingECG}
+                                    onChange={handleChange}
+                                    className="block p-4 w-full text-base text-slate-900 bg-slate-50 border border-slate-200 rounded-2xl appearance-none focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all peer"
+                                >
+                                    <option value="0">Normal</option>
+                                    <option value="1">ST-T wave abnormality</option>
+                                    <option value="2">Left ventricular hypertrophy</option>
+                                </select>
+                                <label className="absolute text-sm text-slate-500 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] left-4 bg-slate-50 px-1 rounded peer-focus:text-blue-600">
+                                    Resting ECG
+                                </label>
+                            </div>
+
                             <FloatingInput label="Max Heart Rate" name="MaxHeartRate" value={formData.MaxHeartRate} onChange={handleChange} />
+                            
+                            <div className="relative z-0 w-full mb-6 group">
+                                <select
+                                    name="ExerciseAngina"
+                                    id="ExerciseAngina"
+                                    value={formData.ExerciseAngina}
+                                    onChange={handleChange}
+                                    className="block p-4 w-full text-base text-slate-900 bg-slate-50 border border-slate-200 rounded-2xl appearance-none focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all peer"
+                                >
+                                    <option value="0">No</option>
+                                    <option value="1">Yes</option>
+                                </select>
+                                <label className="absolute text-sm text-slate-500 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] left-4 bg-slate-50 px-1 rounded peer-focus:text-blue-600">
+                                    Exercise Induced Angina
+                                </label>
+                            </div>
+
+                            <FloatingInput label="Oldpeak (ST Dep.)" name="Oldpeak" value={formData.Oldpeak} onChange={handleChange} />
+
+                            <div className="relative z-0 w-full mb-6 group">
+                                <select
+                                    name="ST_Slope"
+                                    id="ST_Slope"
+                                    value={formData.ST_Slope}
+                                    onChange={handleChange}
+                                    className="block p-4 w-full text-base text-slate-900 bg-slate-50 border border-slate-200 rounded-2xl appearance-none focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all peer"
+                                >
+                                    <option value="1">Upsloping</option>
+                                    <option value="2">Flat</option>
+                                    <option value="3">Downsloping</option>
+                                </select>
+                                <label className="absolute text-sm text-slate-500 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] left-4 bg-slate-50 px-1 rounded peer-focus:text-blue-600">
+                                    ST Slope
+                                </label>
+                            </div>
+
+                            <div className="relative z-0 w-full mb-6 group">
+                                <select
+                                    name="Ca"
+                                    id="Ca"
+                                    value={formData.Ca}
+                                    onChange={handleChange}
+                                    className="block p-4 w-full text-base text-slate-900 bg-slate-50 border border-slate-200 rounded-2xl appearance-none focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all peer"
+                                >
+                                    <option value="0">0</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                </select>
+                                <label className="absolute text-sm text-slate-500 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] left-4 bg-slate-50 px-1 rounded peer-focus:text-blue-600">
+                                    Major Vessels (0-3)
+                                </label>
+                            </div>
+
+                            <div className="relative z-0 w-full mb-6 group">
+                                <select
+                                    name="Thal"
+                                    id="Thal"
+                                    value={formData.Thal}
+                                    onChange={handleChange}
+                                    className="block p-4 w-full text-base text-slate-900 bg-slate-50 border border-slate-200 rounded-2xl appearance-none focus:outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition-all peer"
+                                >
+                                    <option value="1">Normal</option>
+                                    <option value="2">Fixed Defect</option>
+                                    <option value="3">Reversable Defect</option>
+                                </select>
+                                <label className="absolute text-sm text-slate-500 transform -translate-y-4 scale-75 top-2 z-10 origin-[0] left-4 bg-slate-50 px-1 rounded peer-focus:text-blue-600">
+                                    Thalassemia
+                                </label>
+                            </div>
+
                         </div>
 
                         <div className="mt-8">
