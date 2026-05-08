@@ -2,12 +2,12 @@
 
 import { motion } from "framer-motion";
 import { Activity, ArrowRight, Chrome, Lock, Mail, ShieldCheck } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import axios from "axios";
 
-export default function LoginPage() {
+function LoginContent() {
     const [formData, setFormData] = useState({ email: "", password: "", remember: false });
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
@@ -209,5 +209,13 @@ export default function LoginPage() {
                 </motion.div>
             </div>
         </div>
+    );
+}
+
+export default function LoginPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+            <LoginContent />
+        </Suspense>
     );
 }
