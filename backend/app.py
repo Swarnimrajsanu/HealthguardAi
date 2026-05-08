@@ -7,6 +7,7 @@ from datetime import datetime
 from bson import ObjectId
 from database import db
 from schemas import UserCreate, UserLogin, UserResponse, ReportCreate, ReportResponse, ChatQuery
+from auth_utils import get_password_hash, verify_password
 from typing import Optional, List
 from openai import OpenAI
 
@@ -16,10 +17,12 @@ client_ai = OpenAI(
   api_key=os.getenv("OPENROUTER_API_KEY"),
 )
 
+frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3000")
+
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000", frontend_url],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

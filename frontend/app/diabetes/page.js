@@ -48,7 +48,7 @@ export default function DiabetesPrediction() {
 
       try {
         const userId = localStorage.getItem("user_id");
-        const url = userId ? `http://localhost:8000/predict/diabetes?user_id=${userId}` : "http://localhost:8000/predict/diabetes";
+        const url = userId ? `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/predict/diabetes?user_id=${userId}` : `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/predict/diabetes`;
         const response = await axios.post(url, payload);
         processResult(response.data.risk_percentage);
       } catch (err) {

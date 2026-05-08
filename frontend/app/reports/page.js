@@ -20,7 +20,7 @@ export default function ReportsPage() {
             }
 
             try {
-                const response = await axios.get(`http://localhost:8000/reports/${userId}`);
+                const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/reports/${userId}`);
                 setReports(response.data);
             } catch (err) {
                 console.error("Failed to fetch reports:", err);

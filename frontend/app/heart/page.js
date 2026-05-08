@@ -55,7 +55,7 @@ export default function HeartPrediction() {
 
         try {
             const userId = localStorage.getItem("user_id");
-            const url = userId ? `http://localhost:8000/predict/heart?user_id=${userId}` : "http://localhost:8000/predict/heart";
+            const url = userId ? `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/predict/heart?user_id=${userId}` : `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/predict/heart`;
             const response = await axios.post(url, payload);
             processResult(response.data.risk_percentage);
         } catch (err) {

@@ -42,7 +42,7 @@ export default function ChatBox() {
         setIsLoading(true);
 
         try {
-            const response = await axios.post("http://localhost:8000/ask-ai", { query: userMessage.content });
+            const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/ask-ai`, { query: userMessage.content });
             appendAiResponse(response.data.reply || response.data.answer);
         } catch (err) {
             console.warn("Backend unavailable, using simulated AI response.");
